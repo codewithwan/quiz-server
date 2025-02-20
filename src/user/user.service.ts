@@ -13,6 +13,15 @@ export class UserService {
     if (!user) {
       throw new Error('User not found');
     }
-    return { userId: user.id, name: user.name, email: user.email };
+    return {
+      status: 'success',
+      message: 'User found',
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        created_at: user.createdAt,
+      },
+    };
   }
 }

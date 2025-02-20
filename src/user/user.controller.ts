@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
-import { AuthenticatedRequest } from '../types/authenticated-request.interface';
+import { User } from '../types/user.interface';
 import { GetProfileDto } from './dto/get-profile.dto';
 
 @Controller('user')
@@ -10,7 +10,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getProfile(@Req() request: AuthenticatedRequest): Promise<GetProfileDto> {
+  async getProfile(@Req() request: User): Promise<GetProfileDto> {
     try {
       const userId = request.user.userId;
       return await this.userService.getProfile(userId);
