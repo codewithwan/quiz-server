@@ -43,40 +43,76 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('should successfully register a user', async () => {
-      const user = { id: '1', name: 'Test', email: 'test@example.com', password: 'hashedPassword', createdAt: new Date() };
+      const user = {
+        id: '1',
+        name: 'Test',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        createdAt: new Date(),
+      };
       jest.spyOn(prisma.user, 'create').mockResolvedValue(user);
 
-      const result = await service.register('Test', 'test@example.com', 'password');
+      const result = await service.register(
+        'Test',
+        'test@example.com',
+        'password',
+      );
 
       expect(result).toEqual({
-        id: user.id,
-        data: { name: user.name, email: user.email },
-        created_at: user.createdAt,
+        status: 'success',
+        message: 'User created successfully',
+        data: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          created_at: user.createdAt,
+        },
       });
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      jest.spyOn(prisma.user, 'create').mockRejectedValue({ code: 'P2002', meta: { target: ['email'] } });
+      jest
+        .spyOn(prisma.user, 'create')
+        .mockRejectedValue({ code: 'P2002', meta: { target: ['email'] } });
 
-      await expect(service.register('Test', 'test@example.com', 'password')).rejects.toThrow(ConflictException);
+      await expect(
+        service.register('Test', 'test@example.com', 'password'),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
   describe('login', () => {
     it('should successfully login a user', async () => {
-      const user = { id: '1', name: 'Test', email: 'test@example.com', password: await bcrypt.hash('password', 10), createdAt: new Date() };
+      const user = {
+        id: '1',
+        name: 'Test',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password', 10),
+        createdAt: new Date(),
+      };
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
 
       const result = await service.login('test@example.com', 'password');
 
-      expect(result).toEqual({ access_token: 'test-token' });
+      expect(result).toEqual({
+        status: 'success',
+        message: 'Login successful',
+        data: {
+          user_id: user.id,
+          access_token: 'test-token',
+          token_type: 'Bearer',
+          expires_in: expect.any(Number),
+        },
+      });
     });
 
     it('should throw UnauthorizedException if invalid credentials', async () => {
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
 
-      await expect(service.login('test@example.com', 'password')).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.login('test@example.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });
