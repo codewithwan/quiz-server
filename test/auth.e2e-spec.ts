@@ -31,11 +31,35 @@ describe('AuthController (e2e)', () => {
       })
       .expect(201);
 
-    expect(response.body).toHaveProperty('id');
-    expect(response.body.data).toEqual({
-      name: 'Tester',
-      email,
+    expect(response.body).toEqual({
+      status: 'success',
+      message: 'User created successfully',
+      data: {
+        id: expect.any(String),
+        name: 'Tester',
+        email,
+        created_at: expect.any(String),
+      },
     });
-    expect(response.body).toHaveProperty('created_at');
+  });
+
+  it('/auth/login (POST)', async () => {
+    const email = 'test@example.com';
+    const password = 'password';
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email, password })
+      .expect(200);
+
+    expect(response.body).toEqual({
+      status: 'success',
+      message: 'Login successful',
+      data: {
+        user_id: expect.any(String),
+        access_token: expect.any(String),
+        token_type: 'Bearer',
+        expires_in: expect.any(Number),
+      },
+    });
   });
 });

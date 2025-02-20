@@ -16,9 +16,16 @@ describe('AuthController', () => {
             login: jest
               .fn()
               .mockResolvedValue({ access_token: 'mocked_token' }),
-            register: jest
-              .fn()
-              .mockResolvedValue({ message: 'User registered' }),
+            register: jest.fn().mockResolvedValue({
+              status: 'success',
+              message: 'User created successfully',
+              data: {
+                id: '1',
+                name: 'test',
+                email: 'test@mail.com',
+                created_at: new Date().toISOString(),
+              },
+            }),
           },
         },
       ],
@@ -38,7 +45,16 @@ describe('AuthController', () => {
       password: 'password',
     });
 
-    expect(response).toEqual({ access_token: 'mocked_token' });
+    expect(response).toEqual({
+      status: 'success',
+      message: 'Login successful',
+      data: {
+        user_id: expect.any(String),
+        access_token: 'mocked_token',
+        token_type: 'Bearer',
+        expires_in: expect.any(Number),
+      },
+    });
     expect(authService.login).toHaveBeenCalledWith('test@mail.com', 'password');
   });
 
@@ -49,7 +65,20 @@ describe('AuthController', () => {
       password: 'password',
     });
 
-    expect(response).toEqual({ message: 'User registered' });
-    expect(authService.register).toHaveBeenCalledWith('test', 'test@mail.com', 'password');
+    expect(response).toEqual({
+      status: 'success',
+      message: 'User created successfully',
+      data: {
+        id: '1',
+        name: 'test',
+        email: 'test@mail.com',
+        created_at: expect.any(String),
+      },
+    });
+    expect(authService.register).toHaveBeenCalledWith(
+      'test',
+      'test@mail.com',
+      'password',
+    );
   });
 });
