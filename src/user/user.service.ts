@@ -24,4 +24,21 @@ export class UserService {
       },
     };
   }
+
+  async updateUserName(userId: string, newName: string): Promise<GetProfileDto> {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { name: newName },
+    });
+    return {
+      status: 'success',
+      message: 'User name updated',
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        created_at: user.createdAt,
+      },
+    };
+  }
 }
