@@ -13,9 +13,16 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {
-            login: jest
-              .fn()
-              .mockResolvedValue({ access_token: 'mocked_token' }),
+            login: jest.fn().mockResolvedValue({
+              status: 'success',
+              message: 'Login successful',
+              data: {
+                user_id: '1',
+                access_token: 'mocked_token',
+                token_type: 'Bearer',
+                expires_in: 3600,
+              },
+            }),
             register: jest.fn().mockResolvedValue({
               status: 'success',
               message: 'User created successfully',
