@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '@prisma/client';
 
 describe('UserService', () => {
   let service: UserService;
@@ -22,7 +23,7 @@ describe('UserService', () => {
   describe('getProfile', () => {
     it('should return user profile', async () => {
       const userId = 'test-id';
-      const user = { id: userId, name: 'Test User', email: 'test@example.com', password: 'hashedPassword', createdAt: new Date() };
+      const user = { id: userId, name: 'Test User', email: 'test@example.com', password: 'hashedPassword', role: Role.USER, createdAt: new Date() };
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user);
 
       const result = await service.getProfile(userId);
@@ -41,7 +42,7 @@ describe('UserService', () => {
     it('should update user name', async () => {
       const userId = 'test-id';
       const newName = 'New Name';
-      const user = { id: userId, name: newName, email: 'test@example.com', password: 'hashedPassword', createdAt: new Date() };
+      const user = { id: userId, name: newName, email: 'test@example.com', password: 'hashedPassword', role: Role.USER, createdAt: new Date() };
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user);
       jest.spyOn(prisma.user, 'update').mockResolvedValue(user);
 

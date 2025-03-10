@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { jwtConstants } from '../config/jwt.config';
+import { Role } from '@prisma/client';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -48,6 +49,7 @@ describe('AuthService', () => {
         name: 'Test',
         email: 'test@example.com',
         password: 'hashedPassword',
+        role: Role.USER,
         createdAt: new Date(),
       };
       jest.spyOn(prisma.user, 'create').mockResolvedValue(user);
@@ -88,6 +90,7 @@ describe('AuthService', () => {
         name: 'Test',
         email: 'test@example.com',
         password: await bcrypt.hash('password', 10),
+        role: Role.USER,
         createdAt: new Date(),
       };
       jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user);

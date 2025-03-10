@@ -13,8 +13,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-  .setTitle('NestJS API')
-  .setDescription('The NestJS API description')
+  .setTitle('Quiz API')
+  .setDescription('API for Quiz')
   .setVersion('1.0')
   .addBearerAuth()
   .build();
