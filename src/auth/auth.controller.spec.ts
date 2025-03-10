@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Role } from '@prisma/client';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -30,6 +31,7 @@ describe('AuthController', () => {
                 id: '1',
                 name: 'test',
                 email: 'test@mail.com',
+                role: Role.USER, 
                 created_at: new Date().toISOString(),
               },
             }),
@@ -79,6 +81,7 @@ describe('AuthController', () => {
         id: '1',
         name: 'test',
         email: 'test@mail.com',
+        role: Role.USER, 
         created_at: expect.any(String),
       },
     });

@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { User } from '../types/user.interface';
 import { GetProfileDto } from './dto/get-profile.dto';
+import { GetRoleDto } from './dto/get-role.dto';
 
 @Controller('user')
 export class UserController {
@@ -30,6 +31,17 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMyRole(@Req() request: User): Promise<GetRoleDto> {
+    try {
+      const userId = request.user.userId;
+      return await this.userService.getMyRole(userId);
+    } catch (error) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getProfileById(@Param('id') id: string): Promise<GetProfileDto> {
     try {
@@ -41,7 +53,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('update-name')
-  async updateUserName(@Req() request: User, @Body('name') newName: string): Promise<GetProfileDto> {
+  async updateUserName(
+    @Req() request: User,
+    @Body('name') newName: string,
+  ): Promise<GetProfileDto> {
     try {
       const userId = request.user.userId;
       return await this.userService.updateUserName(userId, newName);

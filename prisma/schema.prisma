@@ -7,68 +7,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
   email     String   @unique
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
 
-  receipts Receipt[]
+  quizzes     Quiz[]       @relation("UserQuizzes")
+  userAnswers UserAnswer[]
+  quizResults QuizResult[]
 }
 
-model Receipt {
-  id            String   @id @default(uuid()) @db.Uuid
-  userId        String   @db.Uuid
-  storeId       String   @db.Uuid
-  totalAmount   Decimal
-  paymentMethod String
-  purchaseDate  DateTime
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model Quiz {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
 
-  user        User          @relation(fields: [userId], references: [id])
-  store       Store         @relation(fields: [storeId], references: [id])
-  ReceiptItem ReceiptItem[]
+  creator   User   @relation("UserQuizzes", fields: [creatorId], references: [id])
+  creatorId String @db.Uuid
+
+  questions   Question[]
+  userAnswers UserAnswer[]
+  quizResults QuizResult[]
 }
 
-model ReceiptItem {
-  id        String  @id @default(uuid()) @db.Uuid
-  receiptId String  @db.Uuid
-  productId String? @db.Uuid
-  name      String
-  price     Decimal
-  quantity  Int
+model Question {
+  id     String @id @default(uuid()) @db.Uuid
+  quiz   Quiz   @relation(fields: [quizId], references: [id])
+  quizId String @db.Uuid
+  text   String
 
-  receipt Receipt  @relation(fields: [receiptId], references: [id])
-  product Product? @relation(fields: [productId], references: [id])
+  choices     Choice[]
+  userAnswers UserAnswer[]
 }
 
-model Product {
-  id           String         @id @default(uuid()) @db.Uuid
-  name         String
-  category     String?
-  priceHistory PriceHistory[]
+model Choice {
+  id         String   @id @default(uuid()) @db.Uuid
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String   @db.Uuid
+  text       String
+  isCorrect  Boolean  @default(false)
 
-  receiptItems ReceiptItem[]
+  UserAnswer UserAnswer[]
 }
 
-model PriceHistory {
-  id        String   @id @default(uuid()) @db.Uuid
-  productId String   @db.Uuid
-  storeId   String   @db.Uuid
-  price     Decimal
-  date      DateTime @default(now())
+model UserAnswer {
+  id         String   @id @default(uuid()) @db.Uuid
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String   @db.Uuid
+  quiz       Quiz     @relation(fields: [quizId], references: [id])
+  quizId     String   @db.Uuid
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String   @db.Uuid
+  choice     Choice?  @relation(fields: [choiceId], references: [id])
+  choiceId   String?  @db.Uuid
 
-  product Product @relation(fields: [productId], references: [id])
-  store   Store   @relation(fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Store {
-  id       String  @id @default(uuid()) @db.Uuid
-  name     String
-  location String?
+model QuizResult {
+  id             String @id @default(uuid()) @db.Uuid
+  user           User   @relation(fields: [userId], references: [id])
+  userId         String @db.Uuid
+  quiz           Quiz   @relation(fields: [quizId], references: [id])
+  quizId         String @db.Uuid
+  score          Int
+  totalQuestions Int
 
-  receipts       Receipt[]
-  priceHistories PriceHistory[]
+  createdAt DateTime @default(now())
 }
