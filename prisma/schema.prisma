@@ -1,87 +1,87 @@
-generator client {
-  provider = "prisma-client-js"
-}
+  generator client {
+    provider = "prisma-client-js"
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-enum Role {
-  USER
-  ADMIN
-}
+  enum Role {
+    USER
+    ADMIN
+  }
 
-model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
+  model User {
+    id        String   @id @default(uuid()) @db.Uuid
+    name      String
+    email     String   @unique
+    password  String
+    role      Role     @default(USER)
+    createdAt DateTime @default(now())
 
-  quizzes     Quiz[]       @relation("UserQuizzes")
-  userAnswers UserAnswer[]
-  quizResults QuizResult[]
-}
+    quizzes     Quiz[]       @relation("UserQuizzes")
+    userAnswers UserAnswer[]
+    quizResults QuizResult[]
+  }
 
-model Quiz {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String
-  description String?
-  createdAt   DateTime @default(now())
+  model Quiz {
+    id          String   @id @default(uuid()) @db.Uuid
+    title       String
+    description String?
+    createdAt   DateTime @default(now())
 
-  creator   User   @relation("UserQuizzes", fields: [creatorId], references: [id])
-  creatorId String @db.Uuid
+    creator   User   @relation("UserQuizzes", fields: [creatorId], references: [id])
+    creatorId String @db.Uuid
 
-  questions   Question[]
-  userAnswers UserAnswer[]
-  quizResults QuizResult[]
-}
+    questions   Question[]
+    userAnswers UserAnswer[]
+    quizResults QuizResult[]
+  }
 
-model Question {
-  id     String @id @default(uuid()) @db.Uuid
-  quiz   Quiz   @relation(fields: [quizId], references: [id])
-  quizId String @db.Uuid
-  text   String
+  model Question {
+    id     String @id @default(uuid()) @db.Uuid
+    quiz   Quiz   @relation(fields: [quizId], references: [id])
+    quizId String @db.Uuid
+    text   String
 
-  choices     Choice[]
-  userAnswers UserAnswer[]
-}
+    choices     Choice[]
+    userAnswers UserAnswer[]
+  }
 
-model Choice {
-  id         String   @id @default(uuid()) @db.Uuid
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String   @db.Uuid
-  text       String
-  isCorrect  Boolean  @default(false)
+  model Choice {
+    id         String   @id @default(uuid()) @db.Uuid
+    question   Question @relation(fields: [questionId], references: [id])
+    questionId String   @db.Uuid
+    text       String
+    isCorrect  Boolean  @default(false)
 
-  UserAnswer UserAnswer[]
-}
+    UserAnswer UserAnswer[]
+  }
 
-model UserAnswer {
-  id         String   @id @default(uuid()) @db.Uuid
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String   @db.Uuid
-  quiz       Quiz     @relation(fields: [quizId], references: [id])
-  quizId     String   @db.Uuid
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String   @db.Uuid
-  choice     Choice?  @relation(fields: [choiceId], references: [id])
-  choiceId   String?  @db.Uuid
+  model UserAnswer {
+    id         String   @id @default(uuid()) @db.Uuid
+    user       User     @relation(fields: [userId], references: [id])
+    userId     String   @db.Uuid
+    quiz       Quiz     @relation(fields: [quizId], references: [id])
+    quizId     String   @db.Uuid
+    question   Question @relation(fields: [questionId], references: [id])
+    questionId String   @db.Uuid
+    choice     Choice?  @relation(fields: [choiceId], references: [id])
+    choiceId   String?  @db.Uuid
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
 
-model QuizResult {
-  id             String @id @default(uuid()) @db.Uuid
-  user           User   @relation(fields: [userId], references: [id])
-  userId         String @db.Uuid
-  quiz           Quiz   @relation(fields: [quizId], references: [id])
-  quizId         String @db.Uuid
-  score          Int
-  totalQuestions Int
+  model QuizResult {
+    id             String @id @default(uuid()) @db.Uuid
+    user           User   @relation(fields: [userId], references: [id])
+    userId         String @db.Uuid
+    quiz           Quiz   @relation(fields: [quizId], references: [id])
+    quizId         String @db.Uuid
+    score          Int
+    totalQuestions Int
 
-  createdAt DateTime @default(now())
-}
+    createdAt DateTime @default(now())
+  }
